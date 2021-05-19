@@ -4,25 +4,21 @@
         <client_script><![CDATA[function($rootScope, $scope) {
 	/* widget controller */
 	var c = this;
+	var notePos = -1;
 
 	// c.data.notes - loaded by Server script
 
 	c.selectItem = function(idx) {
+		notePos = idx;
 		var id = c.data.notes[idx].sys_id;
 
 		//	$rootScope.noteID = id;
 		$rootScope.$emit('displayNote', id);
 	}
 
-	$rootScope.$on('noteIsUpdated', function(event, noteObj) {
-		for (var i = 0; i < c.data.notes.length; i++) {
-			if (c.data.notes[i].sys_id == noteObj.sys_id) {
-				c.data.notes[i].title = noteObj.title;
-				c.data.notes[i].note = noteObj.note;
-				// TODO do we need to update data in server script
-				break;
-			}
-		}
+	$rootScope.$on('noteIsUpdated', function(event, noteTitle, noteNote) {
+		c.data.notes[notePos].title = noteTitle;
+		c.data.notes[notePos].note = noteNote;
 	});
 
 }]]></client_script>
@@ -45,17 +41,17 @@
 	/* populate the 'data' object */
 	/* e.g., data.table = $sp.getValue('table'); */
 
-	var noteGRs = new GlideRecord('x_snc_createnotes_note'); 
-	noteGRs.addQuery('user', gs.getUserID());
-	noteGRs.orderBy('sys_created_on');
-	noteGRs.query();
+	var noteGR = new GlideRecord('x_snc_createnotes_note'); 
+	noteGR.addQuery('user', gs.getUserID());
+	noteGR.orderBy('sys_created_on');
+	noteGR.query();
 
 	data.notes = [];
-	while (noteGRs.next()) {
-		var note = {};
-		$sp.getRecordDisplayValues(note, noteGRs, 'number, title, sys_id');
-		note.note = noteGRs.getValue('note').slice(0, 20);
-		data.notes.push(note);
+	while (noteGR.next()) {
+		var noteObj = {};
+		$sp.getRecordDisplayValues(noteObj, noteGR, 'number, title, sys_id');
+		noteObj.note = noteGR.getValue('note').slice(0, 20);
+		data.notes.push(noteObj);
 	}
 	
 	if (input && input.action == 'reloadNoteById') {
@@ -69,14 +65,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2021-05-18 06:40:20</sys_created_on>
         <sys_id>38259bb32f803010eac4f3ecf699b6ab</sys_id>
-        <sys_mod_count>39</sys_mod_count>
+        <sys_mod_count>48</sys_mod_count>
         <sys_name>Notes list</sys_name>
         <sys_package display_value="CreateNotes" source="x_snc_createnotes">df5fd9a5090232007f44e1046c8ff69f</sys_package>
         <sys_policy/>
         <sys_scope display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</sys_scope>
         <sys_update_name>sp_widget_38259bb32f803010eac4f3ecf699b6ab</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2021-05-19 08:19:30</sys_updated_on>
+        <sys_updated_on>2021-05-19 10:42:57</sys_updated_on>
         <template><![CDATA[<div class="panel panel-default">
   <div class="panel-heading clearfix">
     <h3 class="panel-title pull-left">

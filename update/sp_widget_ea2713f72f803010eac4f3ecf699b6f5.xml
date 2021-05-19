@@ -7,24 +7,27 @@
 
 	// c.data - empty
 
-	c.display = function reload(res) {
-		c.data.title = res.data.title;
-		c.data.note = res.data.note;
-		c.data.sys_id = res.data.sys_id;
-	}
-
 	c.updateNote = function updateNote() {
 
-		$rootScope.$emit('noteIsUpdated', c.data);
 		c.server.get({action : 'updateNote', 
-									args : { noteId : c.data.sys_id,
-													noteTitle : c.data.title,
-													noteNote : c.data.note
-												 }}).then();
+									noteId : c.data.sys_id,
+									noteTitle : c.data.title,
+									noteNote : c.data.note
+								 }).then(function(r) {
+			$rootScope.$emit('noteIsUpdated', r.data.title, r.data.note);
+		});
 	}
 
 	$rootScope.$on('displayNote', function(event, id) { 
-		c.server.get({action:'loadNode', args: { noteId : id}}).then(c.display);
+		c.server.get({
+			action:'loadNode', 
+			noteId : id}).then(
+			
+			function reload(r) {
+				c.data.title = r.data.title;
+				c.data.note = r.data.note;
+				c.data.sys_id = r.data.sys_id;
+			});
 	});
 }]]></client_script>
         <controller_as>c</controller_as>
@@ -48,18 +51,20 @@
 
 	if (input) {
 
-		var nn = new GlideRecord('x_snc_createnotes_note');
-		nn.get(input.args.noteId);
+		var noteGR = new GlideRecord('x_snc_createnotes_note');
+		noteGR.get(input.noteId);
 
 		if (input.action == 'loadNode') {
 
-			$sp.getRecordDisplayValues(data, nn, 'title, sys_id, note, user');
+			$sp.getRecordDisplayValues(data, noteGR, 'title, sys_id, note, user');
 
 		} else if (input.action == 'updateNote') {
+			noteGR.title = input.noteTitle;
+			noteGR.note = input.noteNote;
+			noteGR.update();
 
-			nn.title = input.args.noteTitle;
-			nn.note = input.args.noteNote;
-			nn.update();
+			data.title = noteGR.getValue('title');
+			data.note = noteGR.getValue('note').slice(0, 20);
 		}
 	}
 
@@ -69,14 +74,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2021-05-18 06:49:11</sys_created_on>
         <sys_id>ea2713f72f803010eac4f3ecf699b6f5</sys_id>
-        <sys_mod_count>49</sys_mod_count>
+        <sys_mod_count>56</sys_mod_count>
         <sys_name>Notes Body</sys_name>
         <sys_package display_value="CreateNotes" source="x_snc_createnotes">df5fd9a5090232007f44e1046c8ff69f</sys_package>
         <sys_policy/>
         <sys_scope display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</sys_scope>
         <sys_update_name>sp_widget_ea2713f72f803010eac4f3ecf699b6f5</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2021-05-19 08:20:15</sys_updated_on>
+        <sys_updated_on>2021-05-19 10:37:21</sys_updated_on>
         <template><![CDATA[<div class="panel panel-default" ng-show="c.data.sys_id" >
   <div class="panel-heading clearfix">
     <div class="row">
