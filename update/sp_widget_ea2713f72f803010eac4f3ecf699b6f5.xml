@@ -7,22 +7,25 @@
 
 	// c.data - empty
 
-	c.updateNote = function updateNote() {
+	c.updateNote = function updateNote(updateType) {
 
 		c.server.get({action : 'updateNote', 
 									noteId : c.data.sys_id,
 									noteTitle : c.data.title,
 									noteNote : c.data.note
 								 }).then(function(r) {
-			$rootScope.$emit('noteIsUpdated', r.data.title, r.data.note);
+			if (updateType == 'title' || updateType == 'note') {
+				$rootScope.$emit('noteIsUpdated', r.data);
+			}
 		});
+
 	}
 
 	$rootScope.$on('displayNote', function(event, id) { 
 		c.server.get({
 			action:'loadNode', 
 			noteId : id}).then(
-			
+
 			function reload(r) {
 				c.data.title = r.data.title;
 				c.data.note = r.data.note;
@@ -74,14 +77,14 @@
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2021-05-18 06:49:11</sys_created_on>
         <sys_id>ea2713f72f803010eac4f3ecf699b6f5</sys_id>
-        <sys_mod_count>56</sys_mod_count>
+        <sys_mod_count>58</sys_mod_count>
         <sys_name>Notes Body</sys_name>
         <sys_package display_value="CreateNotes" source="x_snc_createnotes">df5fd9a5090232007f44e1046c8ff69f</sys_package>
         <sys_policy/>
         <sys_scope display_value="CreateNotes">df5fd9a5090232007f44e1046c8ff69f</sys_scope>
         <sys_update_name>sp_widget_ea2713f72f803010eac4f3ecf699b6f5</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2021-05-19 10:37:21</sys_updated_on>
+        <sys_updated_on>2021-05-19 11:21:36</sys_updated_on>
         <template><![CDATA[<div class="panel panel-default" ng-show="c.data.sys_id" >
   <div class="panel-heading clearfix">
     <div class="row">
